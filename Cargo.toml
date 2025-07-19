@@ -1,0 +1,29 @@
+[package]
+name = "personal_finance_tool"
+version = "0.1.0"
+edition = "2024"
+authors = ["Kendrix Henderson - kendrixhenderson@gmail.com"]
+description = "A personal finance CLI tool for tracking and budget management"
+
+[dependencies]
+# CLI framework
+clap =  { version = "4.0", features = ["derive"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Date handling
+chrono = { version = "0.4", feautres = ["serde"] }
+
+# table formatting
+prettytable-rs = "0.10"
+
+# error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+
+# for later
+# ring = "0.16" # encryption
+# csv = "1.0" # CSV import/export

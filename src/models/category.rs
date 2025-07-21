@@ -1,6 +1,6 @@
+use super::transaction::TransactionErr;
 use serde::{Deserialize, Serialize};
 use std::fmt;
-use super::transaction::TransactionErr;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum Category {
@@ -14,9 +14,9 @@ pub enum Category {
     Salary,
     Investment,
     Freelance,
-    Custom{
+    Custom {
         income_or_expense: String,
-        name: String
+        name: String,
     },
 }
 
@@ -26,26 +26,26 @@ impl Category {
             Self::Salary => true,
             Self::Investment => true,
             Self::Freelance => true,
-            Self::Custom { income_or_expense, name: _ } => {
+            Self::Custom {
+                income_or_expense,
+                name: _,
+            } => {
                 if income_or_expense.eq_ignore_ascii_case("income") {
                     true
                 } else {
                     false
+                }
             }
-        }
             _ => false,
-         }
+        }
     }
 
     pub fn category_type(&self) -> &'static str {
         match self.is_income() {
-                true => "Income",
-                false => "Expense",
+            true => "Income",
+            false => "Expense",
         }
     }
-
-
-
 }
 
 impl fmt::Display for Category {
@@ -61,7 +61,10 @@ impl fmt::Display for Category {
             Self::Salary => write!(f, "Salary"),
             Self::Investment => write!(f, "Investment"),
             Self::Freelance => write!(f, "Freelance"),
-            Self::Custom { income_or_expense: _, name } => write!(f, "{name}"),
+            Self::Custom {
+                income_or_expense: _,
+                name,
+            } => write!(f, "{name}"),
         }
     }
 }
@@ -69,7 +72,7 @@ impl fmt::Display for Category {
 impl std::str::FromStr for Category {
     type Err = TransactionErr;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err>{
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         let up = s.trim().to_uppercase();
         match up.as_str() {
             "FOOD" => Ok(Category::Food),
@@ -88,13 +91,18 @@ impl std::str::FromStr for Category {
                 let raw_name = parts.next().ok_or(TransactionErr::CategoryParse)?;
 
                 let flag = {
-                    if raw_flag.eq_ignore_ascii_case("income") { "Income" } else { "Expense" }
+                    if raw_flag.eq_ignore_ascii_case("income") {
+                        "Income"
+                    } else {
+                        "Expense"
+                    }
                 };
 
-                Ok(Category::Custom { income_or_expense: flag.trim().to_string(), name: raw_name.trim().to_string() })
-
-            },
+                Ok(Category::Custom {
+                    income_or_expense: flag.trim().to_string(),
+                    name: raw_name.trim().to_string(),
+                })
+            }
+        }
     }
 }
-}
-

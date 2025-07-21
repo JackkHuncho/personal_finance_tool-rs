@@ -5,5 +5,6 @@ mod storage;
 mod utils;
 
 fn main() {
-    println!("Hello, world!");
+    let cli = cli::commands::FinCli::parse();
+    println!("{:?}", cli);
 }

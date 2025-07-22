@@ -1,7 +1,8 @@
 use super::category::Category;
 use chrono::{DateTime, Utc};
+use serde;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct Transaction {
     id: u32,
     date: chrono::DateTime<Utc>,
@@ -10,6 +11,7 @@ pub struct Transaction {
     note: Option<String>,
 }
 
+#[derive(Debug)]
 pub enum TransactionErr {
     DateParse,
     AmountParse,

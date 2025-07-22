@@ -1,12 +1,4 @@
-use clap::{Parser, Subcommand};
-
-#[derive(Parser, Debug)]
-#[command(version, about, long_about = None)]
-pub struct FinCli {
-
-    #[command(subcommand)]
-    pub command: Commands,
-}
+use clap::Subcommand;
 
 #[derive(Subcommand, Debug)]
 pub enum Commands {

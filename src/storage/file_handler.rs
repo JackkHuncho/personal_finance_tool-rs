@@ -17,10 +17,14 @@ pub fn data_file_path() -> PathBuf {
 pub fn load_raw() -> Result<Vec<Transaction>, std::io::Error> {
     let path = data_file_path();
     let json = std::fs::read_to_string(path).unwrap();
-
-    let data = serde_json::from_str::<Vec<Transaction>>(&json);
-
-    Ok(data?)
+    
+    if json.trim().is_empty() {
+        return Ok(Vec::new());
+    }
+    
+    let data = serde_json::from_str::<Vec<Transaction>>(&json)
+        .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
+    Ok(data)
 }
 
 pub fn save_raw(contents: &Vec<Transaction>) -> Result<(), std::io::Error> {

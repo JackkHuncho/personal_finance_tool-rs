@@ -1,13 +1,13 @@
 use super::category::Category;
 use crate::storage::file_handler;
-use chrono::{DateTime, Utc};
+use chrono::{NaiveDate, Utc};
 use prettytable::{cell, row, Cell, Row, Table};
 use serde;
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct Transaction {
     id: u32,
-    date: chrono::DateTime<Utc>,
+    date: chrono::NaiveDate,
     amount: f64,
     category: Category,
     note: Option<String>,
@@ -64,10 +64,9 @@ fn parse_trans(
     raw_date: &str,
     raw_amount: &str,
     raw_cat: &str,
-) -> Result<(DateTime<Utc>, f64, Category), TransactionErr> {
-    let date = DateTime::parse_from_rfc3339(raw_date)
-        .map_err(|_| TransactionErr::DateParse)?
-        .with_timezone(&Utc);
+) -> Result<(NaiveDate, f64, Category), TransactionErr> {
+    let date = NaiveDate::parse_from_str(raw_date, "%m/%d/%Y")
+        .map_err(|_| TransactionErr::DateParse)?;
     let amount = raw_amount
         .parse::<f64>()
         .map_err(|_| TransactionErr::AmountParse)?;

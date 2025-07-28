@@ -1,7 +1,7 @@
 use super::category::Category;
 use crate::storage::file_handler;
-use chrono::{NaiveDate, Utc};
-use prettytable::{cell, row, Cell, Row, Table};
+use chrono::NaiveDate;
+use prettytable::{row, Cell, Row, Table};
 use serde;
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -55,7 +55,7 @@ impl Transaction {
         .unwrap();
 
         all_trans.push(new_trans);
-        file_handler::save_raw(&all_trans);
+        let _ = file_handler::save_raw(&all_trans);
         Ok(())
     }
 }
@@ -65,8 +65,8 @@ fn parse_trans(
     raw_amount: &str,
     raw_cat: &str,
 ) -> Result<(NaiveDate, f64, Category), TransactionErr> {
-    let date = NaiveDate::parse_from_str(raw_date, "%m/%d/%Y")
-        .map_err(|_| TransactionErr::DateParse)?;
+    let date =
+        NaiveDate::parse_from_str(raw_date, "%m/%d/%Y").map_err(|_| TransactionErr::DateParse)?;
     let amount = raw_amount
         .parse::<f64>()
         .map_err(|_| TransactionErr::AmountParse)?;
@@ -79,10 +79,10 @@ fn parse_trans(
 
 pub fn print_transactions(transactions: &Vec<Transaction>) {
     let mut table = Table::new();
-    
+
     // Add header row
     table.add_row(row!["ID", "Amount", "Category", "Date", "Notes"]);
-    
+
     // Add data rows
     for transaction in transactions {
         table.add_row(Row::new(vec![
@@ -90,7 +90,7 @@ pub fn print_transactions(transactions: &Vec<Transaction>) {
             Cell::new(&format!("${:.2}", transaction.amount)),
             Cell::new(&transaction.category.to_string()),
             Cell::new(&transaction.date.to_string()),
-            Cell::new(&transaction.note.as_ref().unwrap_or(&String::from("N/A")))
+            Cell::new(&transaction.note.as_ref().unwrap_or(&String::from("N/A"))),
         ]));
     }
     table.printstd();

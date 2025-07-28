@@ -1,6 +1,5 @@
 use std::path::PathBuf;
 use dirs_next;
-use std::{io,fs};
 use super::super::models::transaction::Transaction;
 use serde_json;
 

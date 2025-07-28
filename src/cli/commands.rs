@@ -33,7 +33,7 @@ impl Commands {
                         &category,
                         Some(note.clone().unwrap_or("N/A".to_string())),
                     )
-                    .expect("idk"),
+                    .expect("Issue with creating new transaction"),
                 );
                 let _ = file_handler::save_raw(&transactions);
             }

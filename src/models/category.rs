@@ -86,12 +86,12 @@ impl std::str::FromStr for Category {
             "INVESTMENT" => Ok(Category::Investment),
             "FREELANCE" => Ok(Category::Freelance),
             _ => {
-                let mut parts = s.trim().splitn(2, ':');
-                let raw_flag = parts.next().ok_or(TransactionErr::CategoryParse)?;
-                let raw_name = parts.next().ok_or(TransactionErr::CategoryParse)?;
+                let mut custom_parts = s.trim().splitn(2, ':');
+                let raw_inc_or_exp = custom_parts.next().ok_or(TransactionErr::CategoryParse)?;
+                let raw_name = custom_parts.next().ok_or(TransactionErr::CategoryParse)?;
 
-                let flag = {
-                    if raw_flag.eq_ignore_ascii_case("income") {
+                let inc_or_exp = {
+                    if raw_inc_or_exp.eq_ignore_ascii_case("income") {
                         "Income"
                     } else {
                         "Expense"
@@ -99,7 +99,7 @@ impl std::str::FromStr for Category {
                 };
 
                 Ok(Category::Custom {
-                    income_or_expense: flag.trim().to_string(),
+                    income_or_expense: inc_or_exp.trim().to_string(),
                     name: raw_name.trim().to_string(),
                 })
             }

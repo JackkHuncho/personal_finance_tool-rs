@@ -1,12 +1,11 @@
 use super::category::Category;
-use crate::storage::file_handler;
 use chrono::NaiveDate;
 use prettytable::{row, Cell, Row, Table};
 use serde;
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct Transaction {
-    id: u32,
+    pub id: u32,
     date: chrono::NaiveDate,
     amount: f64,
     category: Category,
@@ -36,27 +35,6 @@ impl Transaction {
             category,
             note,
         })
-    }
-
-    pub fn add(
-        raw_date: &str,
-        raw_amount: &str,
-        raw_cat: &str,
-        note: Option<String>,
-    ) -> Result<(), TransactionErr> {
-        let mut all_trans = file_handler::load_raw().unwrap();
-        let new_trans = Self::new(
-            all_trans.len() as u32 + 1,
-            raw_date,
-            raw_amount,
-            raw_cat,
-            note,
-        )
-        .unwrap();
-
-        all_trans.push(new_trans);
-        let _ = file_handler::save_raw(&all_trans);
-        Ok(())
     }
 }
 

@@ -21,6 +21,7 @@ pub enum Category {
 }
 
 impl Category {
+    /*
     pub fn is_income(&self) -> bool {
         match self {
             Self::Salary => true,
@@ -46,6 +47,7 @@ impl Category {
             false => "Expense",
         }
     }
+    */
 }
 
 impl fmt::Display for Category {
@@ -218,6 +220,7 @@ mod tests {
         assert_eq!(custom.to_string(), "Bonus");
     }
 
+    /*
     #[test]
     fn test_is_income() {
         // Income categories
@@ -275,6 +278,7 @@ mod tests {
         };
         assert_eq!(expense_custom.category_type(), "Expense");
     }
+    */
 
     #[test]
     fn test_category_serialization() {

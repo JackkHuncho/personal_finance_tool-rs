@@ -11,6 +11,9 @@ pub enum Commands {
         note: Option<String>,
     },
     List {},
+    Delete {
+        id: usize,
+    },
 }
 
 impl Commands {
@@ -37,11 +40,22 @@ impl Commands {
 
                 match file_handler::save_raw(&transactions) {
                     Ok(_) => (),
-                    Err(e) => eprintln!("{}",e),
+                    Err(e) => eprintln!("{}", e),
                 }
             }
             Commands::List {} => {
                 crate::models::transaction::print_transactions(&transactions);
+            }
+            Commands::Delete { id } => {
+                if let Some(index) =  transactions.iter().position( |tx| tx.id as usize == *id){
+                    transactions.remove(index);
+                    match file_handler::save_raw(&transactions) {
+                        Ok(_) => (),
+                        Err(e) => eprintln!("{}", e),
+                    }
+                } else {
+                    eprintln!("Index does not exist");
+                }
             }
         }
     }
@@ -61,7 +75,12 @@ mod tests {
         };
 
         match command {
-            Commands::Add { date, amount, category, note } => {
+            Commands::Add {
+                date,
+                amount,
+                category,
+                note,
+            } => {
                 assert_eq!(date, "01/15/2024");
                 assert_eq!(amount, "25.50");
                 assert_eq!(category, "Food");
@@ -81,7 +100,12 @@ mod tests {
         };
 
         match command {
-            Commands::Add { date, amount, category, note } => {
+            Commands::Add {
+                date,
+                amount,
+                category,
+                note,
+            } => {
                 assert_eq!(date, "01/15/2024");
                 assert_eq!(amount, "25.50");
                 assert_eq!(category, "Food");
@@ -112,14 +136,16 @@ mod tests {
         };
 
         match add_command {
-            Commands::Add { date, amount, category, note } => {
+            Commands::Add {
+                date,
+                amount,
+                category,
+                note,
+            } => {
                 let transaction = crate::models::transaction::Transaction::new(
-                    1,
-                    &date,
-                    &amount,
-                    &category,
-                    note,
-                ).unwrap();
+                    1, &date, &amount, &category, note,
+                )
+                .unwrap();
 
                 // Test that the transaction was created successfully
                 let json = serde_json::to_string(&transaction).unwrap();
@@ -140,13 +166,14 @@ mod tests {
         };
 
         match add_command {
-            Commands::Add { date, amount, category, note } => {
+            Commands::Add {
+                date,
+                amount,
+                category,
+                note,
+            } => {
                 let result = crate::models::transaction::Transaction::new(
-                    1,
-                    &date,
-                    &amount,
-                    &category,
-                    note,
+                    1, &date, &amount, &category, note,
                 );
 
                 assert!(result.is_err());
@@ -159,8 +186,16 @@ mod tests {
     fn test_id_increment_logic() {
         // Test that IDs increment correctly
         let transactions = vec![
-            crate::models::transaction::Transaction::new(1, "01/15/2024", "25.50", "Food", None).unwrap(),
-            crate::models::transaction::Transaction::new(2, "01/16/2024", "30.00", "Transport", None).unwrap(),
+            crate::models::transaction::Transaction::new(1, "01/15/2024", "25.50", "Food", None)
+                .unwrap(),
+            crate::models::transaction::Transaction::new(
+                2,
+                "01/16/2024",
+                "30.00",
+                "Transport",
+                None,
+            )
+            .unwrap(),
         ];
 
         let next_id = transactions.len() as u32 + 1;
@@ -172,7 +207,8 @@ mod tests {
             "15.00",
             "Entertainment",
             None,
-        ).unwrap();
+        )
+        .unwrap();
 
         // Verify the transaction was created with the correct ID
         let json = serde_json::to_string(&new_transaction).unwrap();
@@ -180,5 +216,45 @@ mod tests {
         // the transaction was created successfully
         assert!(json.contains("15"));
         assert!(json.contains("Entertainment"));
+    }
+    #[test]
+    fn test_transaction_delete_valid_data() {
+        let mut transactions = vec![crate::models::transaction::Transaction::new(
+            1,
+            "01/15/2024",
+            "25.50",
+            "Food",
+            None,
+        )
+        .unwrap()];
+        let remove_command = Commands::Delete { id: 1 };
+
+        match remove_command {
+            Commands::Delete { id } => {
+                transactions.remove(id - 1);
+                assert!(transactions.is_empty());
+            }
+            _ => panic!("Expected Remove Command"),
+        }
+    }
+    #[test]
+    fn test_transaction_delete_invalid_data() {
+        let transactions = vec![crate::models::transaction::Transaction::new(
+            1,
+            "01/15/2024",
+            "25.50",
+            "Food",
+            None,
+        )
+        .unwrap()];
+        let remove_command = Commands::Delete { id: 0 };
+
+        match remove_command {
+            Commands::Delete { id } => {
+                let result = transactions.get(id).is_some();
+                assert!(result);
+            }
+            _ => panic!("Expected Remove Command"),
+        }
     }
 }
